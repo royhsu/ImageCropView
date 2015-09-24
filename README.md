@@ -17,6 +17,11 @@
 - iOS 8.0+
 - Xcode 7.0+
   
+## Communication
+- If you **found a bug**, open an issue.
+- If you **have a feature request**, open an issue.
+- If you **want to contribute**, submit a pull request.
+
 ## Installation
 ### CocoaPods
 
