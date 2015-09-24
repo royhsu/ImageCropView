@@ -76,3 +76,7 @@ let cropRect = imageCropView.cropRect()
 ```swift
 imageCropView.setCrop(rect)
 ```
+
+## License
+
+ImageCropView is released under the MIT license. See LICENSE for details.
