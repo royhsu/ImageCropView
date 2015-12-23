@@ -36,11 +36,8 @@ public class ImageCropView: UIScrollView, UIScrollViewDelegate, UIGestureRecogni
     //MARK: - IBInspectable Properties
     
     @IBInspectable var minScale: CGFloat = 0.8
-    
-    
-    //MARK: - Private Properties
 
-    private var tapDelegate: ImageCropViewTapProtocol?
+    weak var imageDelegate: ImageCropViewTapProtocol?
 
     
     //MARK: - Public Properties
@@ -61,10 +58,12 @@ public class ImageCropView: UIScrollView, UIScrollViewDelegate, UIGestureRecogni
 
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+        setup()
     }
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
+        setup()
     }
     
     
@@ -75,18 +74,20 @@ public class ImageCropView: UIScrollView, UIScrollViewDelegate, UIGestureRecogni
 
     - parameter image: Will be displayed in the view
     */
-    public func setup(image: UIImage, tapDelegate: ImageCropViewTapProtocol? = nil) {
+    
+    private func setup() { self.delegate = self }
+    
+    public func setup(image: UIImage) {
         
         let _ = subviews.map { $0.removeFromSuperview() }
         
         coverImageView = UIImageView(image: image)
         coverImageView.frame = CGRect(origin: CGPoint(x: 0, y: 0), size:image.size)
-
+        coverImageView.userInteractionEnabled = false
+        
         addSubview(coverImageView)
         contentSize = image.size
-
-        self.delegate = self
-        self.tapDelegate = tapDelegate
+       
     }
     
     public func display() {
@@ -102,13 +103,6 @@ public class ImageCropView: UIScrollView, UIScrollViewDelegate, UIGestureRecogni
         contentOffset.x = (contentSize.width - bounds.width) / 2
         contentOffset.y = (contentSize.height - bounds.height) / 2
     }
-
-    public override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        if let tapDelegate = tapDelegate {
-            tapDelegate.onImageCropViewTapped(self)
-        }
-    }
-    
     
     public func enableEditing() {
         scrollEnabled = true
@@ -143,8 +137,12 @@ public class ImageCropView: UIScrollView, UIScrollViewDelegate, UIGestureRecogni
     - returns: the cropRect
     */
     public func cropRect() -> CGRect {
+        
         let scale = coverImageView.image!.size.width / coverImageView.frame.width
-        let cropRect = CGRectMake(contentOffset.x * scale, contentOffset.y * scale, frame.width * scale, frame.height * scale)
+        let width = floor(frame.width * scale)
+        let height = floor(frame.height * scale)
+        let cropRect = CGRectMake(contentOffset.x * scale, contentOffset.y * scale, width, height)
+        
         return cropRect
     }
     

@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        imageCropView.setup(UIImage(named: "testImage")!, tapDelegate: self)
+        imageCropView.setup(UIImage(named: "testImage")!)
         imageCropView.display()
         imageCropView.editable = true
     }
@@ -27,10 +27,4 @@ class ViewController: UIViewController {
     }
 
 
-}
-
-extension ViewController: ImageCropViewTapProtocol {
-    func onImageCropViewTapped(imageCropView: ImageCropView) {
-        
-    }
 }

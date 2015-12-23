@@ -58,9 +58,9 @@ public class ImageCaptionCropView: ImageCropView {
     - parameter editIcon:     the caption edit button icon
     - parameter validateIcon: the validate input button icon
     */
-    public func setup(image: UIImage, tapDelegate: ImageCropViewTapProtocol? = nil, editIcon: UIImage, validateIcon: UIImage) {
+    public func setup(image: UIImage, editIcon: UIImage, validateIcon: UIImage) {
         // init
-        super.setup(image, tapDelegate: tapDelegate)
+        super.setup(image)
         self.editIcon = editIcon
         self.validateIcon = validateIcon
         
