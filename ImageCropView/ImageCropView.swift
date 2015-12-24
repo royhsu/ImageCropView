@@ -122,10 +122,15 @@ public class ImageCropView: UIScrollView, UIScrollViewDelegate, UIGestureRecogni
     - returns: the cropped image
     */
     public func croppedImage() -> UIImage? {
-        let tmp = CGImageCreateWithImageInRect(coverImageView.image?.CGImage, cropRect())
-        let img = UIImage(CGImage: tmp!, scale: coverImageView.image!.scale, orientation: coverImageView.image!.imageOrientation)
         
-        return img
+        if let image = coverImageView.image, let croppedImage = CGImageCreateWithImageInRect(image.CGImage, cropRect()) {
+            
+            return UIImage(CGImage: croppedImage, scale: image.scale, orientation: image.imageOrientation)
+            
+        }
+        
+        return nil
+        
     }
 
     /**
