@@ -19,30 +19,30 @@ ImageCropView allow you to easily display and crop images
 7. You can use this component to display a read only cropped image too
 
 
-    imageCropView.setup(myImage)
-    ...
-    imageCropView.display()
-    ...
-    let croppedImage = imageCropView.croppedImage()
-    // or
-    let cropRect = imageCropView.cropRect()
-    ...
-    imageCropView.setCrop(rect)
+imageCropView.setup(myImage)
+...
+imageCropView.display()
+...
+let croppedImage = imageCropView.croppedImage()
+// or
+let cropRect = imageCropView.cropRect()
+...
+imageCropView.setCrop(rect)
 */
 
 @IBDesignable
 public class ImageCropView: UIScrollView, UIScrollViewDelegate, UIGestureRecognizerDelegate {
-
+    
     //MARK: - IBInspectable Properties
     
     @IBInspectable var minScale: CGFloat = 0.8
-
+    
     weak var imageDelegate: ImageCropViewTapProtocol?
-
+    
     
     //MARK: - Public Properties
-
-    public var coverImageView: UIImageView!
+    
+    public var coverImageView: UIImageView?
     public var editable = true {
         didSet {
             if editable {
@@ -52,10 +52,10 @@ public class ImageCropView: UIScrollView, UIScrollViewDelegate, UIGestureRecogni
             }
         }
     }
-
+    
     
     //MARK: - Initializers
-
+    
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         setup()
@@ -71,7 +71,7 @@ public class ImageCropView: UIScrollView, UIScrollViewDelegate, UIGestureRecogni
     
     /**
     Setup the view with a given image
-
+    
     - parameter image: Will be displayed in the view
     */
     
@@ -79,15 +79,17 @@ public class ImageCropView: UIScrollView, UIScrollViewDelegate, UIGestureRecogni
     
     public func setup(image: UIImage) {
         
-        let _ = subviews.map { $0.removeFromSuperview() }
+        coverImageView?.removeFromSuperview()
         
-        coverImageView = UIImageView(image: image)
-        coverImageView.frame = CGRect(origin: CGPoint(x: 0, y: 0), size:image.size)
-        coverImageView.userInteractionEnabled = false
+        let imageView = UIImageView(image: image)
+        imageView.frame = CGRect(origin: CGPoint(x: 0, y: 0), size:image.size)
+        imageView.userInteractionEnabled = false
         
-        addSubview(coverImageView)
+        addSubview(imageView)
         contentSize = image.size
-       
+        
+        coverImageView = imageView
+        
     }
     
     public func display() {
@@ -117,13 +119,13 @@ public class ImageCropView: UIScrollView, UIScrollViewDelegate, UIGestureRecogni
     
     
     /**
-    Crop the image using the ImageCropView bounds and scale factor
-
-    - returns: the cropped image
-    */
+     Crop the image using the ImageCropView bounds and scale factor
+     
+     - returns: the cropped image
+     */
     public func croppedImage() -> UIImage? {
         
-        if let image = coverImageView.image, let croppedImage = CGImageCreateWithImageInRect(image.CGImage, cropRect()) {
+        if let image = coverImageView?.image, let croppedImage = CGImageCreateWithImageInRect(image.CGImage, cropRect()) {
             
             return UIImage(CGImage: croppedImage, scale: image.scale, orientation: image.imageOrientation)
             
@@ -132,33 +134,39 @@ public class ImageCropView: UIScrollView, UIScrollViewDelegate, UIGestureRecogni
         return nil
         
     }
-
+    
     /**
-    Returns the Crop Rect of the image
-    
-    The cropRect will be used to display the image with the right scale and offset.
-    It is calculated using the ImageCropView bounds and scale factor.
-    
-    - returns: the cropRect
-    */
+     Returns the Crop Rect of the image
+     
+     The cropRect will be used to display the image with the right scale and offset.
+     It is calculated using the ImageCropView bounds and scale factor.
+     
+     - returns: the cropRect
+     */
     public func cropRect() -> CGRect {
         
-        let scale = coverImageView.image!.size.width / coverImageView.frame.width
-        let width = floor(frame.width * scale)
-        let height = floor(frame.height * scale)
-        let cropRect = CGRectMake(contentOffset.x * scale, contentOffset.y * scale, width, height)
+        if let imageView = coverImageView, let image = imageView.image {
+            
+            let scale = image.size.width / imageView.frame.width
+            let width = floor(frame.width * scale)
+            let height = floor(frame.height * scale)
+            
+            return CGRect(x: contentOffset.x * scale, y: contentOffset.y * scale, width: width, height: height)
+            
+        }
         
-        return cropRect
+        return CGRectZero
+        
     }
     
     /**
-    Apply crop parameters on the image
-    
-    - parameter rect: The crop Rect
-    */
+     Apply crop parameters on the image
+     
+     - parameter rect: The crop Rect
+     */
     public func setCrop(rect: CGRect) {
         let scale: CGFloat = rect.width / frame.width
-  
+        
         zoomScale = 1 / scale
         contentOffset.x = rect.origin.x / scale
         contentOffset.y = rect.origin.y / scale
@@ -166,7 +174,6 @@ public class ImageCropView: UIScrollView, UIScrollViewDelegate, UIGestureRecogni
     
     //MARK: - UIScrollViewDelegate
     
-    public func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
-        return coverImageView
-    }
+    public func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? { return coverImageView }
+    
 }
